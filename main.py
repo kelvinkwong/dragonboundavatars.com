@@ -28,17 +28,13 @@ def download(url, save=False, filename='tmp.html', cookies=None):
         if save:
             with open(Path(CACHE).joinpath(filename), 'wb') as f:
                 f.write(r.content)
-        return r
+        return r.content
 
 def get_document(url):
     filename = Path(url).name
-    response = download(url, save=True, filename=filename)
-    filename = url.split('/').pop()
+    content = download(url, save=True, filename=filename)
 
-    with open(filename, 'wb') as f:
-        f.write(response.content)
-
-    return lxml.html.fromstring(response.content)
+    return lxml.html.fromstring(content)
 
 def get_document_from_file(path):
     content = None
@@ -99,12 +95,12 @@ def main():
     glasses = 'http://dragonboundavatars.com/glasses.html'
 
     equipment = glasses
-    currencies_allowed = ['cash', 'gold']
-    # currencies_allowed = ['gold']
+    # currencies_allowed = ['cash', 'gold']
+    currencies_allowed = ['gold']
     sum_attributes = ['defense', 'HP']
     # sum_attributes = ['attack', 'defense', 'HP']
     sum_attributes = ['popularity', 'attack', 'defense', 'HP']
-    sum_attributes = ['popularity', 'speed', 'attack', 'defense', 'HP', 'dig']
+    # sum_attributes = ['popularity', 'speed', 'attack', 'defense', 'HP', 'dig']
     order_by_attribute = 'summed_attributes'
 
     avatars = get_avatars(equipment, currencies_allowed, sum_attributes, order_by_attribute)
