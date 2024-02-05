@@ -7,14 +7,32 @@ import requests
 import lxml.html
 from lxml import etree
 import json
+from pathlib import Path
 
-def download(url):
-    response = requests.get(url)
-    if response.ok:
-        return response
+CACHE = 'cache'
+
+def download(url, save=False, filename='tmp.html', cookies=None):
+    logging.debug('enter download')
+    if not Path(CACHE).is_dir():
+        Path(CACHE).mkdir()
+
+    if Path(CACHE).joinpath(filename).is_file():
+        content = None
+        with open(Path(CACHE).joinpath(filename), 'rb') as f:
+            content = f.read()
+        return content
+
+    logging.debug(f'downloading - {filename} - {url}')
+    r = requests.get(url, cookies=cookies)
+    if r.ok:
+        if save:
+            with open(Path(CACHE).joinpath(filename), 'wb') as f:
+                f.write(r.content)
+        return r
 
 def get_document(url):
-    response = download(url)
+    filename = Path(url).name
+    response = download(url, save=True, filename=filename)
     filename = url.split('/').pop()
 
     with open(filename, 'wb') as f:
@@ -28,14 +46,12 @@ def get_document_from_file(path):
         content = f.read()
     return lxml.html.fromstring(content)
 
-def get_avatars(path, currencies_allowed, sum_attributes, order_by_attribute):
+def get_avatars(url, currencies_allowed, sum_attributes, order_by_attribute):
     headers = []
     avatars = []
 
-    if path.startswith('http://'):
-        document = get_document(path)
-    else:
-        document = get_document_from_file(path)
+    document = get_document(url)
+
     for position, header in enumerate(document.xpath('//thead//th')):
         logging.debug(f'{position} - {header.text}')
         if position != 0 and header.text != '':
@@ -82,7 +98,7 @@ def main():
     flags = "http://dragonboundavatars.com/flags.html"
     glasses = 'http://dragonboundavatars.com/glasses.html'
 
-    equipment = 'hats.html'
+    equipment = glasses
     currencies_allowed = ['cash', 'gold']
     # currencies_allowed = ['gold']
     sum_attributes = ['defense', 'HP']
