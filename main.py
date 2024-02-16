@@ -17,6 +17,7 @@ def download(url, save=False, filename='tmp.html', cookies=None):
         Path(CACHE).mkdir()
 
     if Path(CACHE).joinpath(filename).is_file():
+        logging.debug(f'using cache - {filename} - {url}')
         content = None
         with open(Path(CACHE).joinpath(filename), 'rb') as f:
             content = f.read()
@@ -34,12 +35,6 @@ def get_document(url):
     filename = Path(url).name
     content = download(url, save=True, filename=filename)
 
-    return lxml.html.fromstring(content)
-
-def get_document_from_file(path):
-    content = None
-    with open(path, 'r') as f:
-        content = f.read()
     return lxml.html.fromstring(content)
 
 def get_avatars(url, currencies_allowed, sum_attributes, order_by_attribute):
@@ -100,6 +95,7 @@ def main():
     sum_attributes = ['defense', 'HP']
     # sum_attributes = ['attack', 'defense', 'HP']
     sum_attributes = ['popularity', 'attack', 'defense', 'HP']
+    # sum_attributes = ['popularity', 'defense', 'HP']
     # sum_attributes = ['popularity', 'speed', 'attack', 'defense', 'HP', 'dig']
     order_by_attribute = 'summed_attributes'
 
