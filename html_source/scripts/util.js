@@ -1,8 +1,9 @@
 Util = {};
 
-Util.getElementByXpath = function (path, document) {
+Util.getElementByXpath = function (path, parent) {
     //https://stackoverflow.com/a/68216786/14689102
-    snapshot = document.evaluate(path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    //https://stackoverflow.com/a/42600459
+    snapshot = document.evaluate(path, parent || document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     return [...Array(snapshot.snapshotLength)]
         .map((_, i) => snapshot.snapshotItem(i));
 }
@@ -19,14 +20,26 @@ Util.fetch_html = async function (url){
     return doc;
 }
 
-Util.get_thead_index = function (name){
-    let xpath = '//*[@id="myTable"]/thead/tr/th';
-    let thead = Util.getElementByXpath(xpath, document);
+Util.get_thead_index = function (table, name){
+    let thead = Util.getElementByXpath('.//th', table);
     let column = null;
     for (const [index, th] of thead.entries()){
-        console.log(index, th, th.innerText.indexOf(name));
+//        console.log(index, th, th.innerText.indexOf(name));
         if (th.innerText.indexOf(name) >= 0)
             column = index;
     }
     return column;
+}
+
+Util.table_insert_column = function (table, name){
+    console.log('enter table_insert_column');
+    let thead = Util.getElementByXpath('.//thead/tr', table)[0];
+    let th = document.createElement('th');
+    th.innerText = name;
+    thead.append(th);
+
+    for (tr of Util.getElementByXpath('.//tbody/tr', table)){
+        let td = document.createElement('td');
+        tr.append(td)
+    }
 }
