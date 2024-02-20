@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', onload, false);
 
 function onclick_filter_currency(state, name){
     let column = Util.get_thead_index(document.getElementsByTagName('table')[0], name);
-    let xpath = `//*[@id="myTable"]/tbody/tr/td[${column}][text() > "0"]`;
+    let xpath = `//*[@id="myTable"]/tbody/tr/td[${column}][text() = "0"]`;
     let tbody = Util.getElementByXpath(xpath, document);
     for (td of tbody){
         tr = td.parentElement;
@@ -97,13 +97,12 @@ function add_option_for_equipment_type(parent){
 
 function add_option_for_currency(parent){
     let label = 'Currencies: ';
-    let options = [{innerText: 'cash', checked: true},
-                   {innerText: 'gold', checked: true}];
+    let options = [{innerText: 'cash', value: 'gold', checked: true},
+                   {innerText: 'gold', value: 'cash', checked: true}];
     for (option of options){
         option.type = 'checkbox';
-        option.value = option.innerText;
         option.onclick = 'onclick_filter_currency(this.checked, this.value)';
-        option.id = `${option.type}-${option.value}`;
+        option.id = `${option.type}-${option.innerText}`;
     }
     add_option_template(parent, label, options);
 }
@@ -188,8 +187,10 @@ async function get_table(url){
     div.append(table);
 
     let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="checkbox-popularity"]'];
+//    let checkboxes = ['//*[@id="checkbox-popularity"]'];
     for (checkbox of checkboxes){
         option = Util.getElementByXpath(checkbox)[0];
+        option.checked = true;
         option.click();
     }
 
