@@ -109,7 +109,7 @@ function add_option_for_currency(parent){
 
 function add_option_for_sum_stat(parent){
     let label = 'Sum stats: ';
-    let options = [{innerText: 'popularity', checked: false},
+    let options = [{innerText: 'popularity', checked: true},
                    {innerText: 'shot delay', checked: false},
                    {innerText: 'attack', checked: true},
                    {innerText: 'defense', checked: true},
@@ -120,10 +120,16 @@ function add_option_for_sum_stat(parent){
     for (option of options){
         option.type = 'checkbox';
         option.value = option.innerText;
-        option.onclick = 'onclick_sum_stat(this.parentElement)';
         option.id = `${option.type}-${option.value}`;
     }
     add_option_template(parent, label, options);
+
+    button = document.createElement('button');
+    button.type = 'button';
+    button.innerText = 'Calculate';
+    button.id = `${button.type}-${button.innerText}`
+    button.setAttribute('onclick', 'onclick_sum_stat(this.parentElement)');
+    parent.children[parent.children.length-1].append(button);
 }
 
 function add_option_for_genders(parent){
@@ -186,8 +192,7 @@ async function get_table(url){
     div = document.getElementById('table');
     div.append(table);
 
-    let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="checkbox-popularity"]'];
-//    let checkboxes = ['//*[@id="checkbox-popularity"]'];
+    let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="button-Calculate"]'];
     for (checkbox of checkboxes){
         option = Util.getElementByXpath(checkbox)[0];
         option.checked = true;
