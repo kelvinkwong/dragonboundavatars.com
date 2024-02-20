@@ -50,19 +50,14 @@ function onclick_sum_stat(checkboxes){
 
     for (tr of tbody){
         let sum = 0;
-        for (const [index, td] of tr.childNodes.entries()){
-            let real_index = (index-1)/2;
-            if (stats_selected.indexOf(real_index) >= 0){
-                sum += Number(td.innerText);
-            }
+
+        for (selected of stats_selected){
+            sum += Number(tr.children[selected].innerText);
         }
-        for (const [index, td] of tr.childNodes.entries()){
-            let real_index = (index-1)/2;
-            if (real_index == sum_column){
-                td.innerText = sum;
-                td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
-            }
-        }
+
+        td = tr.children[sum_column];
+        td.innerText = sum;
+        td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
     }
 }
 
