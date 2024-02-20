@@ -43,3 +43,19 @@ Util.table_insert_column = function (table, name){
         tr.append(td)
     }
 }
+
+Util.table_delete_column = function (table, name, column){
+    if (column == null){
+        column = Util.get_thead_index(table, name);
+    }
+
+    for (th of Util.getElementByXpath(`.//thead/tr/th[${column}]`, table)){
+        console.log(th);
+        th.parentElement.removeChild(th);
+    }
+
+    for (td of Util.getElementByXpath(`.//tbody/tr/td[${column}]`, table)){
+        console.log(td);
+        td.parentElement.removeChild(td);
+    }
+}
