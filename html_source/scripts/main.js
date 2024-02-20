@@ -130,7 +130,8 @@ function add_option_for_sum_stat(parent){
 function add_option_for_genders(parent){
     let label = 'Gender: ';
     let options = [{innerText: 'female', checked: true},
-                   {innerText: 'male', checked: true}];
+                   {innerText: 'male', checked: true},
+                   {innerText: 'any', checked: true}];
     for (option of options){
         option.type = 'checkbox';
         option.value = option.innerText.charAt(0);
@@ -177,7 +178,7 @@ async function get_table(url){
     table = Util.getElementByXpath(table, doc)[0];
     //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
 
-//    Util.table_delete_column(table, null, 1);
+//    Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
     Util.table_insert_column(table, 'sum_stat');
 
