@@ -26,36 +26,25 @@ Util.get_thead_index = function (table, name){
     for (const [index, th] of thead.entries()){
 //        console.log(index, th, th.innerText.indexOf(name));
         if (th.innerText.indexOf(name) >= 0)
-            column = index;
+            return index;
     }
-    return column;
 }
 
 Util.table_insert_column = function (table, name){
-    console.log('enter table_insert_column');
+//    console.log('enter table_insert_column');
     let thead = Util.getElementByXpath('.//thead/tr', table)[0];
     let th = document.createElement('th');
     th.innerText = name;
     thead.append(th);
 
-    for (tr of Util.getElementByXpath('.//tbody/tr', table)){
-        let td = document.createElement('td');
-        tr.append(td)
-    }
+    for (tr of Util.getElementByXpath('.//tbody/tr', table))
+        tr.append(document.createElement('td'));
 }
 
 Util.table_delete_column = function (table, name, column){
-    if (column == null){
+    if (column == null)
         column = Util.get_thead_index(table, name);
-    }
 
-    for (th of Util.getElementByXpath(`.//thead/tr/th[${column}]`, table)){
-        console.log(th);
-        th.parentElement.removeChild(th);
-    }
-
-    for (td of Util.getElementByXpath(`.//tbody/tr/td[${column}]`, table)){
-        console.log(td);
-        td.parentElement.removeChild(td);
-    }
+    for (tr of Util.getElementByXpath('.//tr', table))
+        tr.removeChild(tr.children[column]);
 }
