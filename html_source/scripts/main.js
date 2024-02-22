@@ -10,28 +10,28 @@ document.addEventListener('DOMContentLoaded', onload, false);
 function onclick_filter_currency(state, name){
     let column = Util.get_thead_index(document.getElementsByTagName('table')[0], name);
     let xpath = `//*[@id="myTable"]/tbody/tr/td[${column}][text() = "0"]`;
-    let tbody = Util.getElementByXpath(xpath, document);
-    for (td of tbody){
-        tr = td.parentElement;
-        tr.hidden = !state;
+
+    for (td of Util.getElementByXpath(xpath, document)){
+        td.hidden = !state;
     }
+
+    table_hide_rows(document);
 }
 
 function onclick_filters_gender(state, name, header){
     let column = Util.get_thead_index(document.getElementsByTagName('table')[0], header);
-    let xpath = `//*[@id="table"]/table/tbody/tr/td[${column}][text() = "${name}"]`
-    let tbody = Util.getElementByXpath(xpath, document);
+    let xpath = `//*[@id="table"]/table/tbody/tr/td[${column}][text() = "${name}"]`;
 
-    for (td of tbody){
-        tr = td.parentElement;
-        //https://stackoverflow.com/a/51187875/14689102
-        //tr.style.display = state ? '' : 'none';
-        tr.hidden = !state;
+    for (td of Util.getElementByXpath(xpath, document)){
+        td.hidden = !state;
     }
+
+    table_hide_rows(document);
 }
 
-function onclick_sum_stat(checkboxes){
+function onclick_sum_stat(myself, checkboxes){
     console.log('get onclick sum stat');
+    myself.disabled = true;
     let stats_selected = [];
     let table = document.getElementsByTagName('table')[0];
     checkboxes = Util.getElementByXpath('.//input', checkboxes);
@@ -43,8 +43,6 @@ function onclick_sum_stat(checkboxes){
     }
 
     let sum_column = Util.get_thead_index(table, 'sum_stat');
-    console.log(sum_column);
-
     let xpath = `//*[@id="table"]/table/tbody/tr`;
     let tbody = Util.getElementByXpath(xpath, document);
 
@@ -59,6 +57,7 @@ function onclick_sum_stat(checkboxes){
         td.innerText = sum;
         td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
     }
+    myself.disabled = false;
 }
 
 function onclick_equipment_type(url){
@@ -110,7 +109,7 @@ function add_option_for_currency(parent){
 function add_option_for_sum_stat(parent){
     let label = 'Sum stats: ';
     let options = [{innerText: 'popularity', checked: true},
-                   {innerText: 'shot delay', checked: false},
+                   {innerText: 'shot delay', checked: false, value: 'speed'},
                    {innerText: 'attack', checked: true},
                    {innerText: 'defense', checked: true},
                    {innerText: 'HP', checked: true},
@@ -119,7 +118,7 @@ function add_option_for_sum_stat(parent){
                    {innerText: 'shield regen', checked: false}];
     for (option of options){
         option.type = 'checkbox';
-        option.value = option.innerText;
+        option.value = option.value ? option.value : option.innerText;
         option.id = `${option.type}-${option.value}`;
     }
     add_option_template(parent, label, options);
@@ -128,7 +127,7 @@ function add_option_for_sum_stat(parent){
     button.type = 'button';
     button.innerText = 'Calculate';
     button.id = `${button.type}-${button.innerText}`
-    button.setAttribute('onclick', 'onclick_sum_stat(this.parentElement)');
+    button.setAttribute('onclick', 'onclick_sum_stat(this, this.parentElement)');
     parent.children[parent.children.length-1].append(button);
 }
 
@@ -156,7 +155,7 @@ function add_option_template(parent, label, options){
         let label = document.createElement('label');
         for (const [key, value] of Object.entries(option)){
             if ('innerText' == key) continue;
-            if ('checked' == key){
+            else if ('checked' == key){
                 input.checked = value;
             }
             else{
@@ -181,12 +180,12 @@ async function get_table(url){
     let table = '//table';
 
     table = Util.getElementByXpath(table, doc)[0];
-    //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
 
 //    Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
     Util.table_insert_column(table, 'sum_stat');
 
+    //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
     sorttable.makeSortable(table);
 
     div = document.getElementById('table');
@@ -200,4 +199,15 @@ async function get_table(url){
     }
 
     return table;
+}
+
+function table_hide_rows(table){
+    for (tr of Util.getElementByXpath('.//tbody/tr[td[@hidden]]', table)){
+        tr.hidden = true;
+    }
+
+    for (tr of Util.getElementByXpath('.//tbody/tr[@hidden]', table)){
+        if (-1 == tr.innerHTML.indexOf('hidden'))
+            tr.hidden = false;
+    }
 }
