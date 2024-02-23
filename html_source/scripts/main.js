@@ -1,7 +1,7 @@
 async function onload(){
     console.log('onload: start');
     add_options();
-    trigger_equipment_selection();
+    add_tables();
     console.log('onload: end');
 }
 //https://stackoverflow.com/a/9899701
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', onload, false);
 
 function onclick_filter_currency(state, name){
     let column = Util.get_thead_index(document.getElementsByTagName('table')[0], name);
-    let xpath = `//*[@id="myTable"]/tbody/tr/td[${column}][text() = "0"]`;
+    let xpath = `//table/tbody/tr/td[${column}][text() = "0"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -20,7 +20,7 @@ function onclick_filter_currency(state, name){
 
 function onclick_filters_gender(state, name, header){
     let column = Util.get_thead_index(document.getElementsByTagName('table')[0], header);
-    let xpath = `//*[@id="table"]/table/tbody/tr/td[${column}][text() = "${name}"]`;
+    let xpath = `//table/tbody/tr/td[${column}][text() = "${name}"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -43,10 +43,9 @@ function onclick_sum_stat(myself, checkboxes){
     }
 
     let sum_column = Util.get_thead_index(table, 'sum_stat');
-    let xpath = `//*[@id="table"]/table/tbody/tr`;
-    let tbody = Util.getElementByXpath(xpath, document);
 
-    for (tr of tbody){
+    let xpath = `//table/tbody/tr`;
+    for (tr of Util.getElementByXpath(xpath, document)){
         let sum = 0;
 
         for (selected of stats_selected){
@@ -60,38 +59,14 @@ function onclick_sum_stat(myself, checkboxes){
     myself.disabled = false;
 }
 
-function onclick_equipment_type(url){
-    console.log('onclick_equipment_type', url);
-    table = document.getElementById('table');
-    table.innerHTML = '';
-    get_table(url);
-}
-
 function add_options(){
     parent = document.getElementById('options');
     form = document.createElement('form');
     parent.append(form);
 
-    add_option_for_equipment_type(form);
     add_option_for_currency(form);
     add_option_for_genders(form);
     add_option_for_sum_stat(form);
-}
-
-function add_option_for_equipment_type(parent){
-    let label = 'Equipment: ';
-    let options = [{innerText: 'body', checked: true},
-                   {innerText: 'flags', checked: false},
-                   {innerText: 'glasses', checked: false},
-                   {innerText: 'hats', checked: false}];
-    for (option of options){
-        option.type = 'radio';
-        option.value = `${option.innerText}.html`
-        option.name = `${option.type}-equipment`;
-        option.onclick = 'onclick_equipment_type(this.value)';
-        option.id = `${option.type}-${option.value}`;
-    }
-    add_option_template(parent, label, options);
 }
 
 function add_option_for_currency(parent){
@@ -169,18 +144,24 @@ function add_option_template(parent, label, options){
     }
 }
 
-async function trigger_equipment_selection(){
-    let xpath = '//*[@id="radio-body.html"]';
-    option = Util.getElementByXpath(xpath)[0];
-    await option.click();
+async function add_tables(){
+    urls = ['body.html', 'flags.html', 'glasses.html', 'hats.html'];
+
+    parent = document.getElementById('tables');
+    parent.classList.add('row');
+
+    for (url of urls){
+        get_table(url, parent);
+    }
 }
 
-async function get_table(url){
+async function get_table(url, parent){
     let doc = await Util.fetch_html(url);
     let table = '//table';
-
     table = Util.getElementByXpath(table, doc)[0];
+    table.id = url;
 
+//  Removing this breaks xpath for columns; why?
 //    Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
     Util.table_insert_column(table, 'sum_stat');
@@ -188,8 +169,10 @@ async function get_table(url){
     //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
     sorttable.makeSortable(table);
 
-    div = document.getElementById('table');
+    div = document.createElement('div');
+    div.classList.add('column');
     div.append(table);
+    parent.append(div);
 
     let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="button-Calculate"]'];
     for (checkbox of checkboxes){
@@ -197,16 +180,14 @@ async function get_table(url){
         option.checked = true;
         option.click();
     }
-
-    return table;
 }
 
 function table_hide_rows(table){
-    for (tr of Util.getElementByXpath('.//tbody/tr[td[@hidden]]', table)){
+    for (tr of Util.getElementByXpath('.//table/tbody/tr[td[@hidden]]', table)){
         tr.hidden = true;
     }
 
-    for (tr of Util.getElementByXpath('.//tbody/tr[@hidden]', table)){
+    for (tr of Util.getElementByXpath('.//table/tbody/tr[@hidden]', table)){
         if (-1 == tr.innerHTML.indexOf('hidden'))
             tr.hidden = false;
     }

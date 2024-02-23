@@ -1,15 +1,46 @@
+body {
+    background-color: #1b1a19;
+    color: #edebe9;
+}
+
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
+  font-size: 10px;
 }
 
 td, th {
   border: 1px solid #dddddd;
   text-align: left;
-  padding: 8px;
+  padding: 5px;
+}
+
+tr:nth-child(odd) {
+  background-color: black;
 }
 
 tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: #000099;
 }
+
+/* https://www.w3schools.com/howto/howto_css_two_columns.asp */
+.row {
+  display: flex;
+}
+.column {
+  flex: 25%;
+  /* width: 25%; */
+  margin: 5px;
+}
+
+/*
+.row {
+  display: flex;
+}
+
+.column {
+  float: left;
+  width: 25%;
+}
+*/
