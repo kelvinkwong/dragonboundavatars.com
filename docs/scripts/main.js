@@ -151,7 +151,7 @@ async function add_tables(){
     parent.classList.add('row');
 
     for (url of urls){
-        get_table(url, parent);
+        get_table('./cache/' + url, parent);
     }
 }
 

@@ -3,7 +3,7 @@ import lxml.html
 import logging
 
 class Html():
-    def __init__(self, output='cache/index.html'):
+    def __init__(self, output='docs/index.html'):
         self.html = None
         self.assets = None
         self.output = output
@@ -15,14 +15,14 @@ class Html():
             E.META(name='viewport', content='width=device-width, initial-scale=1'),
 
             E.TITLE('Dragonbound.net Avatars'),
-            E.LINK(rel="stylesheet", href="../html_source/styles/main.css", type="text/css"),
-            E.SCRIPT(src='../html_source/scripts/util.js'),
-            E.SCRIPT(src='../html_source/scripts/main.js'),
-            E.SCRIPT(src='../html_source/scripts/sorttable.js')
+            E.LINK(rel="stylesheet", href="./styles/main.css", type="text/css"),
+            E.SCRIPT(src='./scripts/util.js'),
+            E.SCRIPT(src='./scripts/main.js'),
+            E.SCRIPT(src='./scripts/sorttable.js')
         )
         body = E.BODY(
             E.DIV(id='options'),
-            E.DIV(id='table')
+            E.DIV(id='tables')
         )
         self.html = E.HTML(
             head,
