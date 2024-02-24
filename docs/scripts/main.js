@@ -8,8 +8,8 @@ async function onload(){
 document.addEventListener('DOMContentLoaded', onload, false);
 
 function onclick_filter_currency(state, name){
-    let column = Util.get_thead_index(document.getElementsByTagName('table')[0], name);
-    let xpath = `//table/tbody/tr/td[${column}][text() = "0"]`;
+    let xcolumn = Util.get_thead_index(document.getElementsByTagName('table')[0], name) + 1;
+    let xpath = `//table/tbody/tr/td[${xcolumn}][text() = "0"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -19,8 +19,8 @@ function onclick_filter_currency(state, name){
 }
 
 function onclick_filters_gender(state, name, header){
-    let column = Util.get_thead_index(document.getElementsByTagName('table')[0], header);
-    let xpath = `//table/tbody/tr/td[${column}][text() = "${name}"]`;
+    let xcolumn = Util.get_thead_index(document.getElementsByTagName('table')[0], header) + 1;
+    let xpath = `//table/tbody/tr/td[${xcolumn}][text() = "${name}"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -44,8 +44,7 @@ function onclick_sum_stat(myself, checkboxes){
 
     let sum_column = Util.get_thead_index(table, 'sum_stat');
 
-    let xpath = `//table/tbody/tr`;
-    for (tr of Util.getElementByXpath(xpath, document)){
+    for (tr of Util.getElementByXpath(`//table/tbody/tr`, document)){
         let sum = 0;
 
         for (selected of stats_selected){
@@ -55,6 +54,12 @@ function onclick_sum_stat(myself, checkboxes){
         td = tr.children[sum_column];
         td.innerText = sum;
         td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
+    }
+
+    for (sum_stat of Util.getElementByXpath('//table/thead/tr/th[text() = "sum_stat"]', document)){
+        console.log(sum_stat);
+        sum_stat.click();
+        sum_stat.click();
     }
     myself.disabled = false;
 }
@@ -145,13 +150,22 @@ function add_option_template(parent, label, options){
 }
 
 async function add_tables(){
-    urls = ['body.html', 'flags.html', 'glasses.html', 'hats.html'];
+    let urls = ['body.html', 'flags.html', 'glasses.html', 'hats.html'];
+//    urls = ['flags.html'];
+//    urls = ['body.html'];
 
-    parent = document.getElementById('tables');
+    let parent = document.getElementById('tables');
     parent.classList.add('row');
 
     for (url of urls){
-        get_table('./cache/' + url, parent);
+        await get_table('./cache/' + url, parent);
+    }
+
+    let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="button-Calculate"]'];
+    for (checkbox of checkboxes){
+        option = Util.getElementByXpath(checkbox)[0];
+        option.checked = true;
+        option.click();
     }
 }
 
@@ -161,10 +175,10 @@ async function get_table(url, parent){
     table = Util.getElementByXpath(table, doc)[0];
     table.id = url;
 
-//  Removing this breaks xpath for columns; why?
-//    Util.table_delete_column(table, null, 0);
+    Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
-    Util.table_insert_column(table, 'sum_stat');
+//    Util.table_insert_column(table, 'sum_stat');
+    Util.table_replace_column(table, 'page number', 'sum_stat');
 
     //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
     sorttable.makeSortable(table);
@@ -173,13 +187,6 @@ async function get_table(url, parent){
     div.classList.add('column');
     div.append(table);
     parent.append(div);
-
-    let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="button-Calculate"]'];
-    for (checkbox of checkboxes){
-        option = Util.getElementByXpath(checkbox)[0];
-        option.checked = true;
-        option.click();
-    }
 }
 
 function table_hide_rows(table){
