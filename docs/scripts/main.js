@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', onload, false);
 
 function onclick_filter_currency(state, name){
     let xcolumn = Util.get_thead_index(document.getElementsByTagName('table')[0], name) + 1;
-    let xpath = `//table/tbody/tr/td[${xcolumn}][text() = "0"]`;
+    let xpath = `//div[@id="tables"]//tbody/tr/td[${xcolumn}][text() = "0"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -20,7 +20,7 @@ function onclick_filter_currency(state, name){
 
 function onclick_filters_gender(state, name, header){
     let xcolumn = Util.get_thead_index(document.getElementsByTagName('table')[0], header) + 1;
-    let xpath = `//table/tbody/tr/td[${xcolumn}][text() = "${name}"]`;
+    let xpath = `//div[@id="tables"]//tbody/tr/td[${xcolumn}][text() = "${name}"]`;
 
     for (td of Util.getElementByXpath(xpath, document)){
         td.hidden = !state;
@@ -44,7 +44,7 @@ function onclick_sum_stat(myself, checkboxes){
 
     let sum_column = Util.get_thead_index(table, 'sum_stat');
 
-    for (tr of Util.getElementByXpath(`//table/tbody/tr`, document)){
+    for (tr of Util.getElementByXpath(`//div[@id="tables"]//tbody/tr`, document)){
         let sum = 0;
 
         for (selected of stats_selected){
@@ -56,9 +56,11 @@ function onclick_sum_stat(myself, checkboxes){
         td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
     }
 
-    for (sum_stat of Util.getElementByXpath('//table/thead/tr/th[text() = "sum_stat"]', document)){
+    for (sum_stat of Util.getElementByXpath('//div[@id="tables"]//thead/tr/th[text() = "sum_stat"]', document)){
         console.log(sum_stat);
+        // Order by ascending
         sum_stat.click();
+        // Order by descending
         sum_stat.click();
     }
     myself.disabled = false;
@@ -150,15 +152,11 @@ function add_option_template(parent, label, options){
 }
 
 async function add_tables(){
-    let urls = ['body.html', 'flags.html', 'glasses.html', 'hats.html'];
-//    urls = ['flags.html'];
-//    urls = ['body.html'];
-
     let parent = document.getElementById('tables');
     parent.classList.add('row');
 
-    for (url of urls){
-        await get_table('./cache/' + url, parent);
+    for (url of URLS){
+        await get_table(url, parent);
     }
 
     let checkboxes = ['//*[@id="checkbox-f"]', '//*[@id="checkbox-cash"]', '//*[@id="button-Calculate"]'];
@@ -167,18 +165,22 @@ async function add_tables(){
         option.checked = true;
         option.click();
     }
+
+    table_tr_add_event(document);
 }
 
 async function get_table(url, parent){
     let doc = await Util.fetch_html(url);
     let table = '//table';
-    table = Util.getElementByXpath(table, doc)[0];
+    table = await Util.getElementByXpath(table, doc)[0];
     table.id = url;
 
     Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
 //    Util.table_insert_column(table, 'sum_stat');
     Util.table_replace_column(table, 'page number', 'sum_stat');
+
+    add_selected_table(table.getElementsByTagName('thead')[0].cloneNode(true));
 
     //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
     sorttable.makeSortable(table);
@@ -197,5 +199,69 @@ function table_hide_rows(table){
     for (tr of Util.getElementByXpath('.//table/tbody/tr[@hidden]', table)){
         if (-1 == tr.innerHTML.indexOf('hidden'))
             tr.hidden = false;
+    }
+}
+
+function table_tr_add_event(table){
+    for (tr of Util.getElementByXpath('.//div[@id="tables"]//tbody/tr', table))
+        tr.setAttribute('onclick', 'onclick_tr_selected(this, this.parentElement.parentElement)');
+}
+
+function onclick_tr_selected(tr, table){
+    for (previous of table.getElementsByClassName(ID_SELECTED_ROW))
+        previous.classList.remove(ID_SELECTED_ROW);
+    tr.classList.add(ID_SELECTED_ROW);
+
+    let new_selected_row = tr.cloneNode(true);
+    new_selected_row.removeAttribute('onclick');
+    new_selected_row.id = ID_SELECTED_TABLE + table.id;
+
+    let selected_row = document.getElementById(ID_SELECTED_TABLE + table.id);
+    selected_row.replaceWith(new_selected_row);
+
+    columns = ['cash price', 'gold price', 'sum_stat', 'popularity', 'speed', 'attack', 'defense', 'HP', 'item delay', 'dig', 'shield regen'];
+    sum_columns(document.getElementById(ID_SELECTED_TABLE), columns);
+}
+
+function add_selected_table(thead){
+    if (document.getElementById(ID_SELECTED_TABLE))
+        return;
+
+
+    parent = document.getElementById('options');
+    let table = document.createElement('table');
+    let tbody = document.createElement('tbody');
+    let tfoot = document.createElement('tfoot');
+    let tfoot_tr = document.createElement('tr');
+    tfoot.append(tfoot_tr);
+    table.append(thead);
+    table.append(tbody);
+    table.append(tfoot);
+    parent.append(table);
+
+    table.id = ID_SELECTED_TABLE;
+
+    for (type of URLS){
+        tr = document.createElement('tr');
+        tr.id = ID_SELECTED_TABLE + type;
+        tbody.append(tr);
+    }
+    for (cell of thead.getElementsByTagName('th'))
+        tfoot_tr.append(document.createElement('td'));
+}
+
+function sum_columns(table, columns){
+    let xcolumns = [];
+    for (column of columns){
+        xcolumns.push(Util.get_thead_index(table, column) + 1);
+    }
+
+    for (xcolumn of xcolumns){
+        let sum = 0;
+        for (column of Util.getElementByXpath(`.//tbody/tr/td[${xcolumn}]`, table)){
+            sum += Number(column.innerText);
+        }
+        tfoot = Util.getElementByXpath(`.//tfoot/tr/td[${xcolumn}]`, table)[0];
+        tfoot.innerText = sum;
     }
 }

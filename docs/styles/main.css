@@ -1,5 +1,5 @@
 body {
-    background-color: #1b1a19;
+    background-color: black;
     color: #edebe9;
 }
 
@@ -10,10 +10,19 @@ table {
   font-size: 10px;
 }
 
+thead {
+  position: sticky;
+  top: 0;
+}
+
 td, th {
   border: 1px solid #dddddd;
   text-align: left;
-  padding: 5px;
+  padding: 3px;
+}
+
+.selected_row {
+  color: red;
 }
 
 tr:nth-child(odd) {
@@ -21,7 +30,8 @@ tr:nth-child(odd) {
 }
 
 tr:nth-child(even) {
-  background-color: #000099;
+  /* https://html-color.codes/black */
+  background-color: #2f4f4f;
 }
 
 /* https://www.w3schools.com/howto/howto_css_two_columns.asp */
@@ -33,14 +43,3 @@ tr:nth-child(even) {
   /* width: 25%; */
   margin: 5px;
 }
-
-/*
-.row {
-  display: flex;
-}
-
-.column {
-  float: left;
-  width: 25%;
-}
-*/
