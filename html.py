@@ -16,6 +16,7 @@ class Html():
 
             E.TITLE('Dragonbound.net Avatars'),
             E.LINK(rel="stylesheet", href="./styles/main.css", type="text/css"),
+            E.SCRIPT(src='./scripts/config.js'),
             E.SCRIPT(src='./scripts/util.js'),
             E.SCRIPT(src='./scripts/main.js'),
             E.SCRIPT(src='./scripts/sorttable.js')
