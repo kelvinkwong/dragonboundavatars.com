@@ -97,9 +97,9 @@ sorttable = {
             sorttable.reverse(this.sorttable_tbody);
             this.className = this.className.replace('sorttable_sorted',
                                                     'sorttable_sorted_reverse');
-            this.removeChild(document.getElementById('sorttable_sortfwdind'));
+            this.removeChild(this.getElementsByClassName('sorttable_sortfwdind')[0]);
             sortrevind = document.createElement('span');
-            sortrevind.id = "sorttable_sortrevind";
+            sortrevind.classList.add("sorttable_sortrevind");
             sortrevind.innerHTML = stIsIE ? '&nbsp<font face="webdings">5</font>' : '&nbsp;&#x25B4;';
             this.appendChild(sortrevind);
             return;
@@ -110,9 +110,9 @@ sorttable = {
             sorttable.reverse(this.sorttable_tbody);
             this.className = this.className.replace('sorttable_sorted_reverse',
                                                     'sorttable_sorted');
-            this.removeChild(document.getElementById('sorttable_sortrevind'));
+            this.removeChild(this.getElementsByClassName('sorttable_sortrevind')[0]);
             sortfwdind = document.createElement('span');
-            sortfwdind.id = "sorttable_sortfwdind";
+            sortfwdind.classList.add("sorttable_sortfwdind");
             sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
             this.appendChild(sortfwdind);
             return;
@@ -133,7 +133,7 @@ sorttable = {
 
           this.className += ' sorttable_sorted';
           sortfwdind = document.createElement('span');
-          sortfwdind.id = "sorttable_sortfwdind";
+          sortfwdind.classList.add("sorttable_sortfwdind");
           sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
           this.appendChild(sortfwdind);
 
@@ -169,7 +169,7 @@ sorttable = {
     for (var i=0; i<table.tBodies[0].rows.length; i++) {
       text = sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);
       if (text != '') {
-        if (text.match(/^-?[£$¤]?[\d,.]+%?$/)) {
+        if (text.match(/^-?[<A3>$<A4>]?[\d,.]+%?$/)) {
           return sorttable.sort_numeric;
         }
         // check for a date: dd/mm/yyyy or dd/mm/yy
