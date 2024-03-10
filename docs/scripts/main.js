@@ -56,13 +56,15 @@ function onclick_sum_stat(myself, checkboxes){
         td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
     }
 
-    for (sum_stat of Util.getElementByXpath('//div[@id="tables"]//thead/tr/th[text() = "sum_stat"]', document)){
-        console.log(sum_stat);
-        // Order by ascending
-        sum_stat.click();
-        // Order by descending
-        sum_stat.click();
+    for (table of Util.getElementByXpath('//div[@id="tables"]//table', document)){
+        for (sum_stat of Util.getElementByXpath('.//thead/tr/th[text() = "sum_stat"]', table)){
+            // Order by ascending
+            sorttable.always_resort(sum_stat);
+            // Order by descending
+            sum_stat.click();
+        }
     }
+
     myself.disabled = false;
 }
 
