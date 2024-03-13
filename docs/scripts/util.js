@@ -20,7 +20,8 @@ Util.fetch_html = async function (url){
 }
 
 Util.get_thead_index = function (table, name){
-    let thead = Util.getElementByXpath('.//thead/tr/th', table);
+    let thead = table.tHead.getElementsByTagName('th');
+    thead = Array.from(thead);
     for (const [index, th] of thead.entries()){
 //        console.log(index, th, th.innerText.indexOf(name));
         if (th.innerText.indexOf(name) >= 0)
@@ -35,7 +36,7 @@ Util.table_insert_column = function (table, name){
     th.innerText = name;
     thead.append(th);
 
-    for (tr of Util.getElementByXpath('.//tbody/tr', table))
+    for (tr of table.tBodies.getElementsByTagName('td'))
         tr.append(document.createElement('td'));
 }
 

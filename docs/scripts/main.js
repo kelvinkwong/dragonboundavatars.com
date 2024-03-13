@@ -34,7 +34,7 @@ function onclick_sum_stat(myself, checkboxes){
     myself.disabled = true;
     let stats_selected = [];
     let table = document.getElementsByTagName('table')[0];
-    checkboxes = Util.getElementByXpath('.//input', checkboxes);
+    checkboxes = checkboxes.getElementsByTagName('input');
     for (checkbox of checkboxes){
         if (checkbox.checked == true){
             stats_selected.push(Util.get_thead_index(table, checkbox.value));
@@ -56,16 +56,16 @@ function onclick_sum_stat(myself, checkboxes){
         td.setAttribute('sorttable_customkey', String(sum).padStart(2, '0'));
     }
 
-    for (table of Util.getElementByXpath('//div[@id="tables"]//table', document)){
-        for (sum_stat of Util.getElementByXpath('.//thead/tr/th[text() = "sum_stat"]', table)){
-            // Order by ascending
-            sorttable.always_resort(sum_stat);
-            // Order by descending
-            sum_stat.click();
-        }
+    for (sum_stat of Util.getElementByXpath('//div[@id="tables"]//th[text() = "sum_stat"]', document)){
+        // Order by ascending
+        sorttable.always_resort(sum_stat);
+        // Order by descending
+        sum_stat.click();
     }
 
     myself.disabled = false;
+    console.log('finish onclick sum stat');
+    return;
 }
 
 function add_options(){
