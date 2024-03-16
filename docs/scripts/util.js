@@ -51,9 +51,14 @@ Util.table_delete_column = function (table, name, column){
 Util.table_replace_column = function (table, old_name, new_name){
     let xcolumn = Util.get_thead_index(table, old_name) + 1;
 
-    for (th of Util.getElementByXpath(`//table/thead/tr/th[${xcolumn}]`, table))
+    for (th of Util.getElementByXpath(`.//th[${xcolumn}]`, table.tHead))
         th.innerText = new_name;
 
-    for (td of Util.getElementByXpath(`//table/tbody/tr/td[${xcolumn}]`, table))
+    for (td of Util.getElementByXpath(`.//td[${xcolumn}]`, table.tBodies[0]))
         td.innerText = '';
+}
+
+Util.table_replace_th = function(table, old_value, new_value){
+    for (td of Util.getElementByXpath(`.//th[text()="${old_value}"]`, table))
+        td.innerHTML = new_value;
 }

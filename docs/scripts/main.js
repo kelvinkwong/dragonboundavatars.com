@@ -167,22 +167,24 @@ async function add_tables(){
         option.checked = true;
         option.click();
     }
-
-    table_tr_add_event(document);
 }
 
 async function get_table(url, parent){
     let doc = await Util.fetch_html(url);
-    let table = '//table';
-    table = await Util.getElementByXpath(table, doc)[0];
-    table.id = url;
+    let table = doc.getElementsByTagName('table')[0];
 
+    table.id = url;
     Util.table_delete_column(table, null, 0);
 //    Util.table_delete_column(table, 'page number');
 //    Util.table_insert_column(table, 'sum_stat');
     Util.table_replace_column(table, 'page number', 'sum_stat');
 
     add_selected_table(table.getElementsByTagName('thead')[0].cloneNode(true));
+
+    Util.table_replace_th(table.tHead, 'name', table.id);
+
+    for (tr of table.tBodies[0].getElementsByTagName('tr'))
+        tr.setAttribute('onclick', 'onclick_tr_selected(this, this.parentElement.parentElement)');
 
     //https://www.kryogenix.org/code/browser/sorttable/#ajaxtables
     sorttable.makeSortable(table);
@@ -202,11 +204,6 @@ function table_hide_rows(table){
         if (-1 == tr.innerHTML.indexOf('hidden'))
             tr.hidden = false;
     }
-}
-
-function table_tr_add_event(table){
-    for (tr of Util.getElementByXpath('.//div[@id="tables"]//tbody/tr', table))
-        tr.setAttribute('onclick', 'onclick_tr_selected(this, this.parentElement.parentElement)');
 }
 
 function onclick_tr_selected(tr, table){
